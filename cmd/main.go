@@ -2,31 +2,50 @@ package main
 
 import (
 	"fmt"
-	"math"
-	"sync"
+	"os"
+	"strconv"
 
-	"github.com/jeffreylean/blaster/internal/config"
-	"github.com/jeffreylean/blaster/internal/job"
-	"github.com/jeffreylean/blaster/internal/scheduler"
+	_ "net/http/pprof"
+
+	cli "github.com/jawher/mow.cli"
+	"github.com/jeffreylean/blaster/internal/blast"
 )
 
 func main() {
-	// Create scheduler
-	s := scheduler.New()
-	s.Start()
+	app := cli.App("blaster", "")
+	app.Spec = "URI [-w] [-r] [--payload]"
+	var (
+		uri      = app.StringArg("URI", "", "The target server that you want to blast.")
+		workers  = app.StringOpt("w workers", "", "The number of workers to work on your request.")
+		requests = app.StringOpt("r requests", "", "The number of request to send.")
+		payload  = app.StringOpt("payload", "", "Json string")
+	)
 
-	wg := new(sync.WaitGroup)
+	// Specify the action to execute when the app is invoked correctly
+	app.Action = func() {
+		// Build arguments
+		w, err := strconv.Atoi(*workers)
+		if err != nil {
+			fmt.Println("Errors: ", err)
+			os.Exit(2)
+		}
 
-	for i := 0; i < int(config.GetConfigInt64("USERS")); i++ {
-		wg.Add(1)
-		j := new(job.Job)
-		j.Payload = `{"schema":"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-4","data":[{"e":"ue","eid":"7aa40ed1-de74-4519-b398-64c276bf1f3c","tv":"js-3.3.0","tna":"ap1","aid":"food","p":"web","cookie":"1","cs":"UTF-8","lang":"en-US","res":"401x746","cd":"30","dtm":"1648649558166","vp":"444x827","ds":"444x827","vid":"5","sid":"f6b6c920-24c9-484d-9e77-8d4b3c86ebf5","duid":"9fec3275-04bc-4ac9-900d-304628d42251","url":"http://localhost:3000/food","ue_px":"eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5nb29nbGUuYW5hbHl0aWNzLmVuaGFuY2VkLWVjb21tZXJjZS9hY3Rpb24vanNvbnNjaGVtYS8xLTAtMCIsImRhdGEiOnsiYWN0aW9uIjoiY2xpY2sifX19","cx":"eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoiaWdsdTpjb20uc25vd3Bsb3dhbmFseXRpY3Muc25vd3Bsb3cvd2ViX3BhZ2UvanNvbnNjaGVtYS8xLTAtMCIsImRhdGEiOnsiaWQiOiIwMDI5MTBiYS1jOWViLTQ2NWEtYWI0NC0xYjEzMmQwODA2MDcifX1dfQ","stm":"1648649558168"}]}`
-		j.TargetURL = config.GetConfigString("TARGET")
-		j.WaitGroup = wg
-		s.JobQueue <- j
+		r, err := strconv.Atoi(*requests)
+		if err != nil {
+			fmt.Println("Errors: ", err)
+			os.Exit(2)
+		}
+
+		// Send the command
+		blast.Blast(*(uri), *(payload), int64(w), int64(r))
 	}
-	wg.Wait()
-	fmt.Println("Total Success: ", s.Success)
-	fmt.Println("Total Failed: ", s.Fail)
-	fmt.Println("Average Time Taken: ", math.Round(s.AverageTimeTaken*100)/100, "ms")
+	// Invoke the app passing in os.Args
+	app.Run(os.Args)
+}
+
+// ---------------------------------------------------------------------------
+
+// Log logs the error
+func log(action string, err error) {
+	fmt.Printf("unable to %s due to %s\n", action, err.Error())
 }

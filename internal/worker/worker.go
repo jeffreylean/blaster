@@ -13,16 +13,18 @@ type Worker struct {
 	JobChannel      chan Job
 	WorkerSharePool chan chan Job
 	ResultChannel   chan any
+	Rampup          int64
 	Exit            chan bool
 }
 
-func New(pool chan chan Job, result chan any, id int64) *Worker {
+func New(pool chan chan Job, result chan any, id int64, rampup int64) *Worker {
 	return &Worker{
 		ID:              id,
 		JobChannel:      make(chan Job),
 		WorkerSharePool: pool,
 		ResultChannel:   result,
 		Exit:            make(chan bool),
+		Rampup:          rampup,
 	}
 }
 
