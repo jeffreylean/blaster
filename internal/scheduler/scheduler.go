@@ -12,7 +12,8 @@ type Scheduler struct {
 	JobQueue      chan worker.Job
 	MaxWorker     int64
 	ResultChannel chan any
-	Rampup        int64 // In millisecond
+	Rampup        int64 // In seconds
+	StopWorker    bool
 }
 
 func New(workers int64) *Scheduler {
@@ -22,6 +23,7 @@ func New(workers int64) *Scheduler {
 		MaxWorker:     max,
 		JobQueue:      make(chan worker.Job),
 		ResultChannel: make(chan any),
+		StopWorker:    false,
 	}
 }
 
@@ -30,6 +32,9 @@ func (s *Scheduler) Start() {
 		fmt.Println("Starting all workers......")
 		s.Dispatch()
 		for i := int64(0); i < s.MaxWorker; i++ {
+			if s.StopWorker {
+				break
+			}
 			go func(id int64) {
 				fmt.Println("Worker ", id, " created...")
 				w := worker.New(s.WorkerPool, s.ResultChannel, id, s.Rampup)

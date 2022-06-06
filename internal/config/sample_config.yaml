@@ -1,0 +1,52 @@
+iteration: 300
+schedule:
+  - hour: 0
+    requests: 100
+  - hour: 1
+    requests: 100
+  - hour: 2
+    requests: 100
+  - hour: 3
+    requests: 100
+  - hour: 4
+    requests: 100
+  - hour: 5
+    requests: 100
+  - hour: 6
+    requests: 100
+  - hour: 7
+    requests: 100
+  - hour: 8
+    requests: 100
+  - hour: 9
+    requests: 100
+  - hour: 10
+    requests: 100
+  - hour: 11
+    requests: 100
+  - hour: 12
+    requests: 100
+  - hour: 13
+    requests: 100
+  - hour: 14
+    requests: 100
+  - hour: 15
+    requests: 100
+  - hour: 16
+    requests: 100
+  - hour: 17
+    requests: 100
+  - hour: 18
+    requests: 100
+  - hour: 19
+    requests: 100
+  - hour: 20
+    requests: 100
+  - hour: 21
+    requests: 100
+  - hour: 22
+    requests: 100
+  - hour: 23
+    requests: 100
+  - hour: 24
+    requests: 100

@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: blaster-lb
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
+    networking.gke.io/internal-load-balancer-allow-global-access: "true"
+    external-dns.alpha.kubernetes.io/hostname: blaster.opdl.stg.data.airasiainternal.net.
+  labels:
+    app: blaster-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: blaster
+  ports:
+    - port: 80
+      targetPort: 1323
+      protocol: TCP
+      name: blaster
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blaster
+  labels:
+    app: blaster
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blaster
+  template:
+    metadata:
+      labels:
+        app: blaster
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: blaster
+          securityContext:
+            capabilities: {}
+            privileged: true
+          image: asia.gcr.io/airasia-opdatalake-stg/blaster-cli:latest
+          imagePullPolicy: "Always"
+          command: ["bash","-c","sysctl -w net.ipv4.tcp_tw_reuse=1 && sysctl -w net.ipv4.tcp_fin_timeout=10 && sysctl -w net.ipv4.ip_local_port_range='1024 65535' && /root/blast server 1323"]
+          ports:
+            - containerPort: 1323
+          env:
+            - name: BLASTER_CONF
+              value: gcs://k8s-online-stg-configs/blaster/config.yaml
+            - name: PAYLOAD
+              value: gcs://k8s-online-stg-configs/blaster/payload.txt

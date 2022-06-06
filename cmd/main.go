@@ -9,20 +9,30 @@ import (
 
 	cli "github.com/jawher/mow.cli"
 	"github.com/jeffreylean/blaster/internal/blast"
+	"github.com/jeffreylean/blaster/internal/server"
 )
 
 func main() {
 	app := cli.App("blaster", "")
-	app.Spec = "URI [-w] [-r] [--payload]"
+
+	app.Command("cli", "run in cli mode", cmdCLI)
+	app.Command("server", "run in http server mode", cmdServer)
+	// Invoke the app passing in os.Args
+	app.Run(os.Args)
+}
+
+func cmdCLI(cmd *cli.Cmd) {
+	cmd.Spec = "URI [-w] [-r] [-u] [--payload]"
 	var (
-		uri      = app.StringArg("URI", "", "The target server that you want to blast.")
-		workers  = app.StringOpt("w workers", "", "The number of workers to work on your request.")
-		requests = app.StringOpt("r requests", "", "The number of request to send.")
-		payload  = app.StringOpt("payload", "", "Json string")
+		uri      = cmd.StringArg("URI", "", "The target server that you want to blast.")
+		workers  = cmd.StringOpt("w workers", "", "The number of workers to work on your request.")
+		requests = cmd.StringOpt("r requests", "", "The number of request to send.")
+		rampup   = cmd.StringOpt("u ramp-up", "", "The duration for blaster to take to ramp-up to the full number of workers chosen.")
+		payload  = cmd.StringOpt("payload", "", "Json string")
 	)
 
 	// Specify the action to execute when the app is invoked correctly
-	app.Action = func() {
+	cmd.Action = func() {
 		// Build arguments
 		w, err := strconv.Atoi(*workers)
 		if err != nil {
@@ -36,11 +46,29 @@ func main() {
 			os.Exit(2)
 		}
 
+		u, err := strconv.Atoi(*rampup)
+		if err != nil {
+			fmt.Println("Errors: ", err)
+			os.Exit(2)
+		}
+
 		// Send the command
-		blast.Blast(*(uri), *(payload), int64(w), int64(r))
+		blast.Blast(*(uri), *(payload), int64(w), int64(r), int64(u))
 	}
-	// Invoke the app passing in os.Args
-	app.Run(os.Args)
+}
+
+func cmdServer(cmd *cli.Cmd) {
+	cmd.Spec = "PORT"
+
+	var (
+		port = cmd.StringArg("PORT", "", "Port the server should run on.")
+	)
+
+	// Specify the action to execute when the app is invoked correctly
+	cmd.Action = func() {
+		// Send the command
+		server.Start(*port)
+	}
 }
 
 // ---------------------------------------------------------------------------

@@ -3,19 +3,20 @@ LABEL maintainer="weifonglean@airasia.com"
 
 # Copy the directory into the container outside of the gopath
 ENV GOPRIVATE gitlab.airasiatech.com
-ARG BASEPATH /go/src/gitlab.airasiatech.com/data/platform/blaster
+ENV BASEPATH /go/src/gitlab.airasiatech.com/data/platform/blaster
 
 RUN mkdir -p $BASEPATH
 WORKDIR $BASEPATH
 ADD . $BASEPATH
+# netrc file is present in gitlab runner
 ADD netrc /root/.netrc
 
 # Download and install any required third party dependencies into the container.
-RUN go build -o /go/bin/blast .
+RUN go build -o /go/bin/blast cmd/main.go
 
 # Base image for runtime
 FROM debian:latest
-RUN apt-get update && apt-get install -y ca-certificates
+RUN apt-get update && apt-get install -y ca-certificates procps
 
 WORKDIR /root/
 COPY --from=builder /go/bin/blast .
