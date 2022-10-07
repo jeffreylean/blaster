@@ -1,4 +1,4 @@
 .envrc
 /*.yaml
 /*.txt
-deployment/
+deployments/
