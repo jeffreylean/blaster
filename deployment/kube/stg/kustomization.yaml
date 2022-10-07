@@ -1,5 +1,0 @@
-namePrefix: stg-
-bases:
-  - ../base
-    #patchesStrategicMerge:
-    #- set_config.yaml
