@@ -10,10 +10,14 @@ import (
 )
 
 type Result struct {
-	Success          int64
-	Fail             int64
+	// Number of success request.
+	Success int64
+	// Number of failed request.
+	Fail int64
+	// Average time taken of each request.
 	AverageTimeTaken float64
-	ResultChannel    chan any
+	// Channel where response is received from each worker.
+	ResultChannel chan any
 }
 
 func (r *Result) PrintResult() {

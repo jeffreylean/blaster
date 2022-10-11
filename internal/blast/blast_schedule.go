@@ -8,7 +8,7 @@ import (
 	"github.com/jeffreylean/blaster/internal/config"
 )
 
-func ScheduleBlast(targetUrl, payload string, workers, rampup uint32) error {
+func ScheduleBlast(targetUrl string, payload []byte, workers, rampup uint32) error {
 	c := config.LoadOrPanic()
 
 	nextTime := time.Now()

@@ -26,7 +26,7 @@ func RunLoadScheduler(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 
-	go blast.ScheduleBlast(i.TargetURL, i.Payload, i.Workers, i.Rampup)
+	go blast.ScheduleBlast(i.TargetURL, []byte(i.Payload), i.Workers, i.Rampup)
 
 	return c.JSON(200, nil)
 }

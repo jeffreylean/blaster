@@ -9,7 +9,7 @@ import (
 
 type Job struct {
 	TargetURL string
-	Payload   string
+	Payload   []byte
 	WaitGroup *sync.WaitGroup
 }
 
@@ -23,20 +23,36 @@ type Response struct {
 
 func (j *Job) Do() Response {
 	defer j.WaitGroup.Done()
-	start := time.Now()
+
+	req := new(http.Request)
 	client := new(http.Client)
 	response := new(Response)
 
-	b := []byte(j.Payload)
+	var err error
 
-	req, err := http.NewRequest("POST", j.TargetURL, bytes.NewBuffer(b))
-	end := time.Since(start)
+	// Default HTTP request set to be POST.
+	req, err = http.NewRequest("POST", j.TargetURL, bytes.NewBuffer(j.Payload))
 	if err != nil {
 		response.Error = err.Error()
 		return *response
 	}
 
+	// If payload is empty will assume it is GET request.
+	if len(j.Payload) == 0 {
+		req, err = http.NewRequest("GET", j.TargetURL, nil)
+		if err != nil {
+			response.Error = err.Error()
+			return *response
+		}
+
+	}
+
+	// Start hold current time before sending request.
+	start := time.Now()
+	// Send HTTP request
 	resp, err := client.Do(req)
+	// Time taken for the request.
+	end := time.Since(start)
 	if err != nil {
 		response.Error = err.Error()
 		return *response
