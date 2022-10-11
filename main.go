@@ -28,7 +28,7 @@ func cmdCLI(cmd *cli.Cmd) {
 		workers  = cmd.StringOpt("w workers", "", "The number of workers to work on your request.")
 		requests = cmd.StringOpt("r requests", "", "The number of request to send.")
 		rampup   = cmd.StringOpt("u ramp-up", "", "The duration for blaster to take to ramp-up to the full number of workers chosen.")
-		payload  = cmd.StringOpt("payload", "", "Json string")
+		payload  = cmd.StringOpt("payload", "", "HTTP body")
 	)
 
 	// Specify the action to execute when the app is invoked correctly

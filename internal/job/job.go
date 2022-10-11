@@ -25,7 +25,7 @@ func (j *Job) Do() Response {
 	defer j.WaitGroup.Done()
 	start := time.Now()
 	client := new(http.Client)
-	response := Response{}
+	response := new(Response)
 
 	b := []byte(j.Payload)
 
@@ -33,17 +33,17 @@ func (j *Job) Do() Response {
 	end := time.Since(start)
 	if err != nil {
 		response.Error = err.Error()
-		return response
+		return *response
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
 		response.Error = err.Error()
-		return response
+		return *response
 	}
 
 	response.Status = resp.StatusCode
 	response.Message = resp.Status
 	response.TimeTaken = float64(end) / float64(time.Millisecond)
-	return response
+	return *response
 }

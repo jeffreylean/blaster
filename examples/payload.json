@@ -1,0 +1,27 @@
+{
+    "schema": "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-4",
+    "data": [{
+        "e": "pv",
+        "url": "http://localhost:3000/checkout?type=odl&subscriptionAdvanceTerm=12months",
+        "page": "Secure Checkout",
+        "refr": "http://localhost:3000/checkout?type=odl&subscriptionAdvanceTerm=12months",
+        "eid": "a2e44fe1-723e-49c2-be75-10b00a3e224f",
+        "tv": "js-3.5.0",
+        "tna": "academy",
+        "aid": "academy",
+        "p": "web",
+        "cookie": "1",
+        "cs": "UTF-8",
+        "lang": "en-US",
+        "res": "1536x864",
+        "cd": "24",
+        "dtm": "1662003287669",
+        "vp": "864x760",
+        "ds": "847x1280",
+        "vid": "6",
+        "sid": "439ce67f-5d3c-47f0-ad04-ff5a6ea34485",
+        "duid": "d7cc7b74-548e-40d1-b913-085917b7ea60",
+        "cx": "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoiaWdsdTpjb20uc25vd3Bsb3dhbmFseXRpY3Muc25vd3Bsb3cvd2ViX3BhZ2UvanNvbnNjaGVtYS8xLTAtMCIsImRhdGEiOnsiaWQiOiI3OTlhNzU5NC0wODc1LTRmNGEtYWRlMS1lZmRlYTQ3NmY1ZjEifX1dfQ",
+        "stm": "1662003287672"
+    }]
+}

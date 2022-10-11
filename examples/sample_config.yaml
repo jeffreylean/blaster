@@ -1,0 +1,52 @@
+iteration: 300
+schedule:
+  - hour: 0
+    requests: 1000
+  - hour: 1
+    requests: 2000
+  - hour: 2
+    requests: 5000
+  - hour: 3
+    requests: 4000
+  - hour: 4
+    requests: 10000
+  - hour: 5
+    requests: 12000
+  - hour: 6
+    requests: 17000
+  - hour: 7
+    requests: 50000
+  - hour: 8
+    requests: 300000
+  - hour: 9
+    requests: 500000
+  - hour: 10
+    requests: 1200000
+  - hour: 11
+    requests: 790000
+  - hour: 12
+    requests: 2300000
+  - hour: 13
+    requests: 3200000
+  - hour: 14
+    requests: 3000000
+  - hour: 15
+    requests: 2200000
+  - hour: 16
+    requests: 1900000
+  - hour: 17
+    requests: 2220000
+  - hour: 18
+    requests: 1190000
+  - hour: 19
+    requests: 700000
+  - hour: 20
+    requests: 300000
+  - hour: 21
+    requests: 10000
+  - hour: 22
+    requests: 80000
+  - hour: 23
+    requests: 3500
+  - hour: 24
+    requests: 10000
