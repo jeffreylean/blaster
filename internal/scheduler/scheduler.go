@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jeffreylean/blaster/internal/metrics"
 	"github.com/jeffreylean/blaster/internal/worker"
 )
 
@@ -11,19 +12,19 @@ type Scheduler struct {
 	WorkerPool    chan chan worker.Job
 	JobQueue      chan worker.Job
 	MaxWorker     int64
-	ResultChannel chan any
 	Rampup        int64 // In seconds
 	StopWorker    bool
+	SampleChannel chan metrics.Samples
 }
 
-func New(workers int64) *Scheduler {
-	max := workers
+func New(workers, rampup int64) *Scheduler {
 	return &Scheduler{
-		WorkerPool:    make(chan chan worker.Job, max),
-		MaxWorker:     max,
+		WorkerPool:    make(chan chan worker.Job, workers),
+		MaxWorker:     workers,
 		JobQueue:      make(chan worker.Job),
-		ResultChannel: make(chan any),
+		SampleChannel: make(chan metrics.Samples),
 		StopWorker:    false,
+		Rampup:        rampup,
 	}
 }
 
@@ -31,15 +32,15 @@ func (s *Scheduler) Start() {
 	go func() {
 		fmt.Println("Starting all workers......")
 		s.Dispatch()
+
 		for i := int64(0); i < s.MaxWorker; i++ {
 			if s.StopWorker {
 				break
 			}
-			go func(id int64) {
-				fmt.Println("Worker ", id, " created...")
-				w := worker.New(s.WorkerPool, s.ResultChannel, id, s.Rampup)
+			go func() {
+				w := worker.New(s.WorkerPool, s.SampleChannel, s.Rampup)
 				w.Work()
-			}(i)
+			}()
 			var waitDuration float32 = float32(s.Rampup) / float32(s.MaxWorker)
 			time.Sleep(time.Duration(int(1000*waitDuration)) * time.Millisecond)
 		}

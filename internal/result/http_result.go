@@ -10,13 +10,13 @@ import (
 )
 
 type Result struct {
-	// Number of success request.
+	// Number of success request
 	Success int64
-	// Number of failed request.
+	// Number of failed request
 	Fail int64
-	// Average time taken of each request.
+	// Average time taken of each request
 	AverageTimeTaken float64
-	// Channel where response is received from each worker.
+	// Channel where response is received from each worker
 	ResultChannel chan any
 }
 

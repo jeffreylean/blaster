@@ -29,7 +29,7 @@ func Load() (*Config, error) {
 			return nil, fmt.Errorf("config: unable to load config, due to %s", err.Error())
 		}
 
-		// Parse YAML
+		// Parse YAML.
 		if err := yaml.Unmarshal(b, cfg); err != nil {
 			return nil, fmt.Errorf("config: unable to parse yaml, due to %s", err.Error())
 		}

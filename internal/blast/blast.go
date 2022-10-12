@@ -2,12 +2,11 @@ package blast
 
 import (
 	"fmt"
-	"math"
 	"sync"
 	"time"
 
 	"github.com/jeffreylean/blaster/internal/job"
-	"github.com/jeffreylean/blaster/internal/result"
+	"github.com/jeffreylean/blaster/internal/metrics"
 	"github.com/jeffreylean/blaster/internal/scheduler"
 )
 
@@ -16,31 +15,33 @@ func Blast(uri string, payload []byte, workers, requests, rampup int64) {
 	wg := new(sync.WaitGroup)
 
 	// Create scheduler
-	s := scheduler.New(workers)
-	s.Rampup = rampup
+	s := scheduler.New(workers, rampup)
 
-	r := new(result.Result)
-	r.ResultChannel = s.ResultChannel
+	// Create metrics
+	m := metrics.New(s.SampleChannel, requests)
 
 	s.Start()
-	r.PrintResult()
-
 	for i := 0; i < int(requests); i++ {
 		wg.Add(1)
 		j := new(job.Job)
 		j.Payload = payload
 		j.TargetURL = uri
 		j.WaitGroup = wg
+		j.Metrics = m.Metrics
 		s.JobQueue <- j
 	}
+
+	m.AggregateMetrics()
+	// Wait for all request finish handle by workers
 	wg.Wait()
+	// Wait for metrics aggregation
+	m.Wg.Wait()
 
 	s.StopWorker = true
 	end := time.Since(start)
-	// Add some buffer time for result to finish aggregate
-	time.Sleep(time.Millisecond * 2000)
-	fmt.Println("Total Success: ", r.Success)
-	fmt.Println("Total Failed: ", r.Fail)
-	fmt.Println("Average Time Taken: ", math.Round(r.AverageTimeTaken*1000)/1000, "ms")
+	m.Summary()
+	//fmt.Println("Total Success: ", r.Success)
+	//fmt.Println("Total Failed: ", r.Fail)
+	//fmt.Println("Average Time Taken: ", math.Round(r.AverageTimeTaken*1000)/1000, "ms")
 	fmt.Println("Total Time Taken: ", end.Seconds(), "s")
 }
