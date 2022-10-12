@@ -19,6 +19,7 @@ func Blast(uri string, payload []byte, workers, requests, rampup int64) {
 
 	// Create metrics
 	m := metrics.New(s.SampleChannel, requests)
+	m.AggregateMetrics()
 
 	s.Start()
 	for i := 0; i < int(requests); i++ {
@@ -31,7 +32,6 @@ func Blast(uri string, payload []byte, workers, requests, rampup int64) {
 		s.JobQueue <- j
 	}
 
-	m.AggregateMetrics()
 	// Wait for all request finish handle by workers
 	wg.Wait()
 	// Wait for metrics aggregation
